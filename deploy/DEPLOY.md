@@ -16,6 +16,41 @@ real hostname for `polycule.example.com` throughout.
 
 ---
 
+## Quick start
+
+On a fresh Ubuntu instance, after [step 1](#1-dns-and-the-security-group) (DNS
+and the security group) is done:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/thermdev/polycule/main/deploy/bootstrap.sh \
+    | bash -s -- polycule.example.com you@example.com
+```
+
+That is steps 2–6 in one shot: packages, Node, clone, build, systemd, nginx,
+and a certificate. Run it as `ubuntu` (not root, not `sudo` — it calls `sudo`
+itself where needed), and re-run it freely; every step converges.
+
+Omit the email to skip TLS. Override defaults with environment variables:
+
+```bash
+REPO_URL=... APP_DIR=/opt/polycule NODE_MAJOR=24 PORT=9000 \
+    ./deploy/bootstrap.sh polycule.example.com
+```
+
+The script clones over HTTPS, which needs no key on the box. If the repo is
+private, either make the clone yourself first (the script will use an existing
+checkout at `APP_DIR` rather than cloning) or pass an SSH URL after adding a
+deploy key:
+
+```bash
+REPO_URL=git@github.com:thermdev/polycule.git ./deploy/bootstrap.sh polycule.example.com
+```
+
+The rest of this document is the same work done by hand, and is worth reading
+if the script fails partway.
+
+---
+
 ## 1. DNS and the security group
 
 Do this first — certbot cannot issue a certificate until the name resolves to
@@ -185,4 +220,7 @@ Worth putting in a cron job with an off-box copy (S3) if the data matters.
 | Blank page, 404s on `/assets/*.js` | `client/dist` missing — run `npm run build`. |
 | `SQLITE_READONLY` / `unable to open database` | The data dir is not in `ReadWritePaths`, or is owned by root. `sudo chown -R ubuntu:ubuntu /srv/polycule/server/data`. |
 | `Error: Could not locate the bindings file` | `better-sqlite3` did not compile. Install `build-essential python3`, then `npm rebuild better-sqlite3`. |
+| `status=203/EXEC` in the journal | `ExecStart` path is wrong. Compare `which node` against the unit file. |
+| Worked before a Node upgrade, now won't load | `node_modules` was built against the old Node. `rm -rf node_modules && npm ci`. |
+| `curl -s` prints nothing at all | Not an empty response — nothing is listening. Use `curl -sS -i`; exit 7 is connection refused. |
 | Certbot: "DNS problem" / "Invalid response" | A record not propagated, or port 80 blocked in the security group. |

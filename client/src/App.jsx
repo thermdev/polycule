@@ -121,8 +121,8 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark">◈</span>
-          <span className="brand-name">Polycule</span>
+          <img className="brand-mark" src="/polylute.png" alt="" />
+          <span className="brand-name">Polylute</span>
         </div>
 
         <DebouncedInput

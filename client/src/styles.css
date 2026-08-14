@@ -81,9 +81,10 @@ code {
 }
 
 .brand-mark {
-  color: var(--accent);
-  font-size: 18px;
-  line-height: 1;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
 }
 
 .brand-name {

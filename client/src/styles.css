@@ -182,7 +182,12 @@ code {
   overflow: hidden;
 }
 
+/* The renderer is called with setSize(w, h, false), which sizes the drawing
+   buffer but deliberately leaves the display size to CSS. Without these the
+   canvas lays out at its attribute size — devicePixelRatio times too large. */
 .viewport canvas {
+  width: 100%;
+  height: 100%;
   outline: none;
 }
 
